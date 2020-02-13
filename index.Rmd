@@ -1,0 +1,11 @@
+---
+title: "Simple Website"
+author: "Phu"
+date: "2/12/2020"
+output: html_document
+---
+
+# The simple yet awesome website
+## Note: 
+### Knit the RMD to an HTML file.
+Then push index.html to github.io repo
