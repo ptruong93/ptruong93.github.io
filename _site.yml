@@ -1,12 +1,12 @@
-name:"Simple"
+name: "Simple"
 navbar:
-  tittle:"Simple"
+  tittle: "Simple"
   letf:
-    - text:"Home"
+    - text: "Home"
       href: index.html
-    - text:"About me"
+    - text: "Aboutme"
       href: Aboutme.html
-    - text:"CLT"
+    - text: "budsweiser"
       href: case_study1_beer.html
       
       
