@@ -1,0 +1,14 @@
+name:"Simple"
+navbar:
+  tittle:"Simple"
+  letf:
+    - text:"Home"
+      href: index.html
+    - text:"About me"
+      href: Aboutme.html
+    - text:"CLT"
+      href: case_study1_beer.html
+      
+      
+    
+  
