@@ -1,0 +1,14 @@
+name: "Simple"
+navbar:
+  tittle: "Simple"
+  letf:
+    - text: "Home"
+      href: index.html
+    - text: "Aboutme"
+      href: Aboutme.html
+    - text: "Case study 1"
+      href: case_study1_beer.html
+      
+      
+    
+  

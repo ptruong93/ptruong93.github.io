@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Phu Truong &amp; Kristi Herman" />
+
+<meta name="date" content="2020-01-16" />
+
+<title>Case Study 1: Exploratory Data Analysis (EDA) for Budweiser</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Case Study 1: Exploratory Data Analysis (EDA) for Budweiser</h1>
+<h4 class="author">Phu Truong &amp; Kristi Herman</h4>
+<h4 class="date">01/16/2020</h4>
+
+</div>
+
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<div id="the-purpose-of-this-exploratory-data-analysis-is-to-answer-questions-from-budweiser-related-to-the-craft-beer-industry-in-the-united-states." class="section level3">
+<h3>The purpose of this exploratory data analysis is to answer questions from Budweiser related to the craft beer industry in the United States.</h3>
+<pre class="r"><code># Import dependencies
+library(tidyverse)</code></pre>
+<pre><code>## -- Attaching packages --------------------------------------- tidyverse 1.3.0 --</code></pre>
+<pre><code>## v ggplot2 3.2.1     v purrr   0.3.3
+## v tibble  2.1.3     v dplyr   0.8.3
+## v tidyr   1.0.0     v stringr 1.4.0
+## v readr   1.3.1     v forcats 0.4.0</code></pre>
+<pre><code>## -- Conflicts ------------------------------------------ tidyverse_conflicts() --
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(dplyr)
+library(ggplot2)
+library(data.table)</code></pre>
+<pre><code>## data.table 1.12.6 using 2 threads (see ?getDTthreads).  Latest news: r-datatable.com</code></pre>
+<pre><code>## 
+## Attaching package: &#39;data.table&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:dplyr&#39;:
+## 
+##     between, first, last</code></pre>
+<pre><code>## The following object is masked from &#39;package:purrr&#39;:
+## 
+##     transpose</code></pre>
+<pre class="r"><code>library(ggthemes)
+library(naniar)
+library(class)
+library(caret)</code></pre>
+<pre><code>## Loading required package: lattice</code></pre>
+<pre><code>## 
+## Attaching package: &#39;caret&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:purrr&#39;:
+## 
+##     lift</code></pre>
+<pre class="r"><code>library(plotly)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;plotly&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:ggplot2&#39;:
+## 
+##     last_plot</code></pre>
+<pre><code>## The following object is masked from &#39;package:stats&#39;:
+## 
+##     filter</code></pre>
+<pre><code>## The following object is masked from &#39;package:graphics&#39;:
+## 
+##     layout</code></pre>
+<pre class="r"><code>library(GGally)</code></pre>
+<pre><code>## Registered S3 method overwritten by &#39;GGally&#39;:
+##   method from   
+##   +.gg   ggplot2</code></pre>
+<pre><code>## 
+## Attaching package: &#39;GGally&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     nasa</code></pre>
+<pre class="r"><code>library(ggpubr)</code></pre>
+<pre><code>## Warning: package &#39;ggpubr&#39; was built under R version 3.6.2</code></pre>
+<pre><code>## Loading required package: magrittr</code></pre>
+<pre><code>## 
+## Attaching package: &#39;magrittr&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:purrr&#39;:
+## 
+##     set_names</code></pre>
+<pre><code>## The following object is masked from &#39;package:tidyr&#39;:
+## 
+##     extract</code></pre>
+<pre class="r"><code>library(tidycensus)
+
+
+# Import Beer and Brewery data
+beer_df &lt;-  read_csv(&quot;Beers.csv&quot;)</code></pre>
+<pre><code>## Parsed with column specification:
+## cols(
+##   Name = col_character(),
+##   Beer_ID = col_double(),
+##   ABV = col_double(),
+##   IBU = col_double(),
+##   Brewery_id = col_double(),
+##   Style = col_character(),
+##   Ounces = col_double()
+## )</code></pre>
+<pre class="r"><code>brew_df &lt;-  read_csv(&quot;Breweries.csv&quot;)</code></pre>
+<pre><code>## Parsed with column specification:
+## cols(
+##   Brew_ID = col_double(),
+##   Name = col_character(),
+##   City = col_character(),
+##   State = col_character()
+## )</code></pre>
+<pre class="r"><code>cities_df &lt;- read_csv(&quot;cities.csv&quot;, col_types = list(col_character(), col_double(), col_double()))
+
+# Check to make sure data imported
+dim(beer_df)</code></pre>
+<pre><code>## [1] 2410    7</code></pre>
+<pre class="r"><code>dim(brew_df)</code></pre>
+<pre><code>## [1] 558   4</code></pre>
+<pre class="r"><code>View(brew_df)</code></pre>
+</div>
+</div>
+<div id="how-many-breweries-are-present-in-each-state" class="section level2">
+<h2>1. How many breweries are present in each state?</h2>
+<pre class="r"><code>#  Group breweries by state
+brew_by_state &lt;- brew_df %&gt;% group_by(State) %&gt;% summarize(count=n())
+
+# Display # of breweries by state
+View(brew_by_state)</code></pre>
+<pre class="r"><code># Plot # of breweries by state in a barchart
+p &lt;- brew_by_state %&gt;%
+  ggplot(aes(x = State, y = count)) +
+  geom_bar(stat = &quot;identity&quot;, fill = &quot;blue&quot;, alpha = .5) +
+  ggtitle(&quot;Number of Breweries by State&quot;) + xlab(&quot;State&quot;) + ylab(&quot;Number of Breweries&quot;) +
+  geom_text(aes(y = count, label = count), fontface = &quot;bold&quot;, vjust = -.4, color = &quot;black&quot;, size = 3) 
+
+p + rotate_x_text(45)</code></pre>
+<p><img src="case_study1_beer_files/figure-html/unnamed-chunk-3-1.png" width="960" /></p>
+<pre class="r"><code># In order to plot the count of breweries on the states using the fifty_states data, get the full state names and add them to the brew_by_state df
+
+# Function to take a list of state abbreviations and return the full state names.  &#39;x&#39; is the column of the df that holds 2-letter state codes.
+state_from_lower &lt;- function(x) {
+  # DF wth 52 state codes and state names [includes DC (Washington D.C. and PR (Puerto Rico)]
+  st_codes &lt;- data.frame(
+                      st_abbr=as.factor(c(&quot;AK&quot;, &quot;AL&quot;, &quot;AR&quot;, &quot;AZ&quot;, &quot;CA&quot;, &quot;CO&quot;, &quot;CT&quot;, &quot;DC&quot;, &quot;DE&quot;, &quot;FL&quot;, &quot;GA&quot;,
+                                         &quot;HI&quot;, &quot;IA&quot;, &quot;ID&quot;, &quot;IL&quot;, &quot;IN&quot;, &quot;KS&quot;, &quot;KY&quot;, &quot;LA&quot;, &quot;MA&quot;, &quot;MD&quot;, &quot;ME&quot;,
+                                         &quot;MI&quot;, &quot;MN&quot;, &quot;MO&quot;, &quot;MS&quot;,  &quot;MT&quot;, &quot;NC&quot;, &quot;ND&quot;, &quot;NE&quot;, &quot;NH&quot;, &quot;NJ&quot;, &quot;NM&quot;,
+                                         &quot;NV&quot;, &quot;NY&quot;, &quot;OH&quot;, &quot;OK&quot;, &quot;OR&quot;, &quot;PA&quot;, &quot;PR&quot;, &quot;RI&quot;, &quot;SC&quot;, &quot;SD&quot;, &quot;TN&quot;,
+                                         &quot;TX&quot;, &quot;UT&quot;, &quot;VA&quot;, &quot;VT&quot;, &quot;WA&quot;, &quot;WI&quot;, &quot;WV&quot;, &quot;WY&quot;)),
+                      full=as.factor(c(&quot;alaska&quot;,&quot;alabama&quot;,&quot;arkansas&quot;,&quot;arizona&quot;,&quot;california&quot;,&quot;colorado&quot;,
+                                       &quot;connecticut&quot;,&quot;district of columbia&quot;,&quot;delaware&quot;,&quot;florida&quot;,&quot;georgia&quot;,
+                                       &quot;hawaii&quot;,&quot;iowa&quot;,&quot;idaho&quot;,&quot;illinois&quot;,&quot;indiana&quot;,&quot;kansas&quot;,&quot;kentucky&quot;,
+                                       &quot;louisiana&quot;,&quot;massachusetts&quot;,&quot;maryland&quot;,&quot;maine&quot;,&quot;michigan&quot;,&quot;minnesota&quot;,
+                                       &quot;missouri&quot;,&quot;mississippi&quot;,&quot;montana&quot;,&quot;north carolina&quot;,&quot;north dakota&quot;,
+                                       &quot;nebraska&quot;,&quot;new hampshire&quot;,&quot;new jersey&quot;,&quot;new mexico&quot;,&quot;nevada&quot;,
+                                       &quot;new york&quot;,&quot;ohio&quot;,&quot;oklahoma&quot;,&quot;oregon&quot;,&quot;pennsylvania&quot;,&quot;puerto rico&quot;,
+                                       &quot;rhode island&quot;,&quot;south carolina&quot;,&quot;south dakota&quot;,&quot;tennessee&quot;,&quot;texas&quot;,
+                                       &quot;utah&quot;,&quot;virginia&quot;,&quot;vermont&quot;,&quot;washington&quot;,&quot;wisconsin&quot;,
+                                       &quot;west virginia&quot;,&quot;wyoming&quot;))
+                       )
+    
+  # Create a df of state codes from x variable
+  st_abbr_df &lt;- data.frame(state=x)
+    
+  # Match state codes with codes from &#39;st_codes&#39; df and use it to return the full state name
+  ret_state &lt;- st_codes$full[match(st_abbr_df$state,st_codes$st_abbr)]
+  print(ret_state)
+   
+  # Return the full state names in the same order in which they appeared in the original source
+  return(ret_state)
+}
+
+brew_by_state$id &lt;- state_from_lower(brew_by_state$State)</code></pre>
+<pre><code>##  [1] alaska               alabama              arkansas            
+##  [4] arizona              california           colorado            
+##  [7] connecticut          district of columbia delaware            
+## [10] florida              georgia              hawaii              
+## [13] iowa                 idaho                illinois            
+## [16] indiana              kansas               kentucky            
+## [19] louisiana            massachusetts        maryland            
+## [22] maine                michigan             minnesota           
+## [25] missouri             mississippi          montana             
+## [28] north carolina       north dakota         nebraska            
+## [31] new hampshire        new jersey           new mexico          
+## [34] nevada               new york             ohio                
+## [37] oklahoma             oregon               pennsylvania        
+## [40] rhode island         south carolina       south dakota        
+## [43] tennessee            texas                utah                
+## [46] virginia             vermont              washington          
+## [49] wisconsin            west virginia        wyoming             
+## 52 Levels: alabama alaska arizona arkansas california ... wyoming</code></pre>
+</div>
+<div id="merge-the-beer-data-with-the-brewery-data.-print-first-and-last-six-observations." class="section level2">
+<h2>2. Merge the Beer Data with the Brewery Data. Print first and last six observations.</h2>
+<pre class="r"><code># Change the column names in the Beer df
+setnames(beer_df, old=c(&quot;Name&quot;,&quot;Brewery_id&quot;), new=c(&quot;Beer_name&quot;, &quot;Brew_ID&quot;))
+
+# Change column name in the Brewery df
+setnames(brew_df, old=c(&quot;Name&quot;), new=c(&quot;Brewery_name&quot;))
+
+# Make the state column a factor
+brew_df$State &lt;-  factor(brew_df$State)
+str(brew_df)</code></pre>
+<pre><code>## Classes &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 558 obs. of  4 variables:
+##  $ Brew_ID     : num  1 2 3 4 5 6 7 8 9 10 ...
+##  $ Brewery_name: chr  &quot;NorthGate Brewing&quot; &quot;Against the Grain Brewery&quot; &quot;Jack&#39;s Abby Craft Lagers&quot; &quot;Mike Hess Brewing Company&quot; ...
+##  $ City        : chr  &quot;Minneapolis&quot; &quot;Louisville&quot; &quot;Framingham&quot; &quot;San Diego&quot; ...
+##  $ State       : Factor w/ 51 levels &quot;AK&quot;,&quot;AL&quot;,&quot;AR&quot;,..: 24 18 20 5 5 41 6 23 23 23 ...
+##  - attr(*, &quot;spec&quot;)=
+##   .. cols(
+##   ..   Brew_ID = col_double(),
+##   ..   Name = col_character(),
+##   ..   City = col_character(),
+##   ..   State = col_character()
+##   .. )</code></pre>
+<pre class="r"><code># Merge the brewery data with the beer data (left join)
+all_df &lt;- merge(beer_df, brew_df, by=&quot;Brew_ID&quot;)
+dim(all_df)</code></pre>
+<pre><code>## [1] 2410   10</code></pre>
+<pre class="r"><code># Print the first &amp; last 6 observations
+(first6= head(all_df,6))</code></pre>
+<pre><code>##   Brew_ID     Beer_name Beer_ID   ABV IBU
+## 1       1  Get Together    2692 0.045  50
+## 2       1 Maggie&#39;s Leap    2691 0.049  26
+## 3       1    Wall&#39;s End    2690 0.048  19
+## 4       1       Pumpion    2689 0.060  38
+## 5       1    Stronghold    2688 0.060  25
+## 6       1   Parapet ESB    2687 0.056  47
+##                                 Style Ounces      Brewery_name        City
+## 1                        American IPA     16 NorthGate Brewing Minneapolis
+## 2                  Milk / Sweet Stout     16 NorthGate Brewing Minneapolis
+## 3                   English Brown Ale     16 NorthGate Brewing Minneapolis
+## 4                         Pumpkin Ale     16 NorthGate Brewing Minneapolis
+## 5                     American Porter     16 NorthGate Brewing Minneapolis
+## 6 Extra Special / Strong Bitter (ESB)     16 NorthGate Brewing Minneapolis
+##   State
+## 1    MN
+## 2    MN
+## 3    MN
+## 4    MN
+## 5    MN
+## 6    MN</code></pre>
+<pre class="r"><code>(last6= tail(all_df,6))</code></pre>
+<pre><code>##      Brew_ID                 Beer_name Beer_ID   ABV IBU
+## 2405     556             Pilsner Ukiah      98 0.055  NA
+## 2406     557  Heinnieweisse Weissebier      52 0.049  NA
+## 2407     557           Snapperhead IPA      51 0.068  NA
+## 2408     557         Moo Thunder Stout      50 0.049  NA
+## 2409     557         Porkslap Pale Ale      49 0.043  NA
+## 2410     558 Urban Wilderness Pale Ale      30 0.049  NA
+##                        Style Ounces                  Brewery_name
+## 2405         German Pilsener     12         Ukiah Brewing Company
+## 2406              Hefeweizen     12       Butternuts Beer and Ale
+## 2407            American IPA     12       Butternuts Beer and Ale
+## 2408      Milk / Sweet Stout     12       Butternuts Beer and Ale
+## 2409 American Pale Ale (APA)     12       Butternuts Beer and Ale
+## 2410        English Pale Ale     12 Sleeping Lady Brewing Company
+##               City State
+## 2405         Ukiah    CA
+## 2406 Garrattsville    NY
+## 2407 Garrattsville    NY
+## 2408 Garrattsville    NY
+## 2409 Garrattsville    NY
+## 2410     Anchorage    AK</code></pre>
+</div>
+<div id="address-the-missing-values-in-each-column" class="section level2">
+<h2>3. Address the missing values in each column</h2>
+<pre class="r"><code># count missing values in each column
+s = sapply(all_df, function(x) sum(is.na(x)))
+s</code></pre>
+<pre><code>##      Brew_ID    Beer_name      Beer_ID          ABV          IBU 
+##            0            0            0           62         1005 
+##        Style       Ounces Brewery_name         City        State 
+##            5            0            0            0            0</code></pre>
+<pre class="r"><code>gg_miss_var(all_df)</code></pre>
+<p><img src="case_study1_beer_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<pre class="r"><code># Remove missing data for beer &amp; rename the Name and Brewery_id Columns
+clean_df &lt;- all_df %&gt;% filter(!is.na(ABV) &amp; !is.na(IBU) &amp; !is.na(Style))
+dim(clean_df)</code></pre>
+<pre><code>## [1] 1403   10</code></pre>
+</div>
+<div id="compute-the-median-alcohol-content-and-international-bitterness-unit-for-each-state.-plot-a-bar-chart-to-compare." class="section level2">
+<h2>4. Compute the median alcohol content and international bitterness unit for each state. Plot a bar chart to compare.</h2>
+<pre class="r"><code># Dataframe with median values for ABV and IBU
+(med_abv_ibu &lt;- clean_df %&gt;% 
+  group_by(State) %&gt;%
+  summarize(med_abv = median(ABV), med_ibu = median(IBU), count = n()))</code></pre>
+<pre><code>## # A tibble: 50 x 4
+##    State med_abv med_ibu count
+##    &lt;fct&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;int&gt;
+##  1 AK      0.057    46      17
+##  2 AL      0.06     43       9
+##  3 AR      0.04     39       1
+##  4 AZ      0.055    20      23
+##  5 CA      0.058    42     135
+##  6 CO      0.065    40     146
+##  7 CT      0.061    29       6
+##  8 DC      0.059    47.5     4
+##  9 DE      0.055    52       1
+## 10 FL      0.062    55      37
+## # ... with 40 more rows</code></pre>
+<pre class="r"><code># Plot the median ABV &amp; IBU
+p2 &lt;- ggplot(med_abv_ibu, aes(x = State)) +
+  geom_col(aes( y = med_ibu, fill=&quot;redfill&quot;)) +
+  geom_text(aes(y = med_ibu, label = med_ibu), fontface = &quot;bold&quot;, vjust = 2.4, color = &quot;white&quot;, size = 4) +
+  geom_line(aes(y = med_abv * 1000, group = 1, color = &#39;blackline&#39;)) +
+  geom_text(aes(y = med_abv * 1000, label = round(med_abv, 2)), vjust = -.4, color = &quot;black&quot;, size = 4) +
+  scale_y_continuous(sec.axis = sec_axis(trans = ~ . / 1000)) +
+  scale_fill_manual(&#39;&#39;, labels = &#39;Median Bitterness (IBU)&#39;, values = &quot;#C00000&quot;) +
+  scale_color_manual(&#39;&#39;, labels = &#39;Median Alcohol By Volumn (ABV)&#39;, values = &#39;black&#39;) +
+  ggtitle(&quot;Median Alcohol Content &amp; International Bitterness by State&quot;) +
+  theme_minimal()
+
+p2 + rotate_x_text(45)</code></pre>
+<p><img src="case_study1_beer_files/figure-html/unnamed-chunk-8-1.png" width="1920" /></p>
+</div>
+<div id="which-state-has-the-maxiumum-alcoholic-abv-beer-which-state-has-the-most-bitter-ibu-beer" class="section level2">
+<h2>5. Which state has the maxiumum alcoholic (ABV) beer? Which state has the most bitter (IBU) beer?</h2>
+<p>###Kentucky has the highest ABV beer, which is called ‘London Balling’, made by Against the Grain Brewery, located in Louisville city. ###Oregon has the highest IBU beer, which is called ‘Bitter Bitch Imperial IPA’, made by Astoria Brewing Company, located in Astoria city.</p>
+<pre class="r"><code># Dataframe with maximum values for ABV and IBU
+max_abv_ibu &lt;- clean_df %&gt;% group_by(State) %&gt;% summarize(max_abv = max(ABV), max_ibu = max(IBU), count = n())
+
+#List row with max ABV
+view(clean_df[which.max(clean_df$ABV),])
+
+#List row with max IBU
+view(clean_df[which.max(clean_df$IBU),])</code></pre>
+<pre class="r"><code># Plot max values for ABV and IBU
+p3 &lt;- ggplot(max_abv_ibu, aes(x = State)) +
+  geom_col(aes( y = max_ibu, fill=&quot;redfill&quot;)) +
+  geom_text(aes(y = max_ibu, label = max_ibu), fontface = &quot;bold&quot;, vjust = 2.4, color = &quot;white&quot;, size = 4) +
+  geom_line(aes(y = max_abv * 1400, group = 1, color = &#39;blackline&#39;)) +
+  geom_text(aes(y = max_abv * 1400, label = round(max_abv, 2)), vjust = -.4, color = &quot;black&quot;, size = 4) +
+  scale_y_continuous(sec.axis = sec_axis(trans = ~ . / 1400)) +
+  scale_fill_manual(&#39;&#39;, labels = &#39;Max Bitterness (IBU)&#39;, values = &quot;#C00000&quot;) +
+  scale_color_manual(&#39;&#39;, labels = &#39;Max Alcohol By Volumn (ABV)&#39;, values = &#39;black&#39;) +
+  ggtitle(&quot;Max Alcohol Content &amp; International Bitterness by State&quot;) +
+  theme_minimal()
+
+p3 + rotate_x_text(45)</code></pre>
+<p><img src="case_study1_beer_files/figure-html/unnamed-chunk-10-1.png" width="1920" /></p>
+</div>
+<div id="comment-on-the-summary-statistics-and-distribution-of-the-abv-variable." class="section level2">
+<h2>6. Comment on the summary statistics and distribution of the ABV variable.</h2>
+<div id="the-distribution-of-abv-variable-is-slightly-right-skewed." class="section level3">
+<h3>The distribution of ABV variable is slightly right-skewed.</h3>
+<pre class="r"><code>#Summary of key statistics of ABV
+summary(clean_df$ABV)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+## 0.02700 0.05000 0.05700 0.05992 0.06800 0.12500</code></pre>
+<pre class="r"><code>#Outliers
+OutVals = boxplot(clean_df$ABV, plot=FALSE)$out
+hist(OutVals)</code></pre>
+<p><img src="case_study1_beer_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<pre class="r"><code># Plot boxplot
+clean_df %&gt;%
+  ggplot(aes(y = ABV)) +
+  geom_boxplot() +
+  ggtitle(&quot;Summary Statistics of the ABV&quot;) + ylab(&quot;ABV&quot;)</code></pre>
+<p><img src="case_study1_beer_files/figure-html/unnamed-chunk-11-2.png" width="672" /></p>
+<pre class="r"><code># Plot histogram of hte ABV distribution
+clean_df %&gt;%
+  ggplot(aes(x = ABV)) +
+  geom_histogram(colour=&quot;black&quot;,fill=&quot;navy&quot;) +
+  ggtitle(&quot;Distribution of ABV&quot;) + xlab(&quot;ABV&quot;)</code></pre>
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="case_study1_beer_files/figure-html/unnamed-chunk-12-1.png" width="960" /></p>
+<pre class="r"><code># t-test
+t.test(clean_df$ABV, conf.level = .95)</code></pre>
+<pre><code>## 
+##  One Sample t-test
+## 
+## data:  clean_df$ABV
+## t = 165.21, df = 1402, p-value &lt; 2.2e-16
+## alternative hypothesis: true mean is not equal to 0
+## 95 percent confidence interval:
+##  0.05920729 0.06063020
+## sample estimates:
+##  mean of x 
+## 0.05991875</code></pre>
+</div>
+</div>
+<div id="is-there-an-apparant-relationship-between-the-bitterness-of-the-beer-and-its-alcoholic-content-draw-a-scatter-plot.-make-your-best-judgment-of-a-relationship-and-explain-your-answer." class="section level2">
+<h2>7. Is there an apparant relationship between the bitterness of the beer and its alcoholic content? Draw a scatter plot. Make your best judgment of a relationship and EXPLAIN your answer.</h2>
+<div id="with-p-value-2.2e-16-there-is-sufficient-evidence-at-alpha-.05-level-of-significance-to-suggest-that-the-data-is-linearly-correlated.-correlation-estimate-0.67-suggests-that-the-relationship-between-ibu-and-abv-is-positive-and-strong." class="section level3">
+<h3>With p-value &lt; 2.2e-16, there is sufficient evidence at alpha= .05 level of significance to suggest that the data is linearly correlated. Correlation estimate =0.67 suggests that the relationship between IBU and ABV is positive and strong.</h3>
+<pre class="r"><code># Plot ABV and IBU
+ggplot(data = clean_df) +
+  geom_point(mapping = aes(x = ABV, y = IBU, color=ABV), position =&quot;jitter&quot;) +
+  ggtitle(&quot;Alcohol Content &amp; Bitterness of Beers&quot;) + xlab(&quot;Alcohol by Volume (ABV)&quot;) + ylab(&quot;International Bitterness Units (IBU)&quot;) +
+  geom_smooth(mapping = aes(x = ABV, y = IBU)) </code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;gam&#39; and formula &#39;y ~ s(x, bs = &quot;cs&quot;)&#39;</code></pre>
+<p><img src="case_study1_beer_files/figure-html/unnamed-chunk-13-1.png" width="960" /></p>
+<pre class="r"><code>#correlation
+cor.test(clean_df$ABV,clean_df$IBU)</code></pre>
+<pre><code>## 
+##  Pearson&#39;s product-moment correlation
+## 
+## data:  clean_df$ABV and clean_df$IBU
+## t = 33.848, df = 1401, p-value &lt; 2.2e-16
+## alternative hypothesis: true correlation is not equal to 0
+## 95 percent confidence interval:
+##  0.6408842 0.6985369
+## sample estimates:
+##       cor 
+## 0.6707224</code></pre>
+</div>
+</div>
+<div id="investigate-the-difference-in-ibu-and-abv-between-ipas-and-other-ales" class="section level2">
+<h2>8. Investigate the difference in IBU and ABV between IPAs and other Ales</h2>
+<pre class="r"><code># Create a dataframe with only IPAs &amp; Ales
+ipa_ale_df &lt;- clean_df %&gt;% filter(str_detect(Style, &#39;IPA&#39;) |str_detect(Style, &#39;Ale&#39;))
+
+# Add a column for &quot;IPA&quot; or &quot;Ale&quot;
+ipa_ale_df$beer_type = ifelse(grepl(&quot;IPA&quot;, ipa_ale_df$Style), &quot;IPA&quot;, &quot;Ale&quot;)
+
+# two sample t-test compare ABV/IBU between IPA and Ale
+t.test(ipa_ale_df$ABV[ipa_ale_df$beer_type==&quot;IPA&quot;],ipa_ale_df$ABV[ipa_ale_df$beer_type==&quot;Ale&quot;],conf.level = .95)</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  ipa_ale_df$ABV[ipa_ale_df$beer_type == &quot;IPA&quot;] and ipa_ale_df$ABV[ipa_ale_df$beer_type == &quot;Ale&quot;]
+## t = 16.23, df = 794.65, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  0.01106438 0.01410901
+## sample estimates:
+##  mean of x  mean of y 
+## 0.06914286 0.05655616</code></pre>
+<pre class="r"><code>t.test(ipa_ale_df$IBU[ipa_ale_df$beer_type==&quot;IPA&quot;],ipa_ale_df$IBU[ipa_ale_df$beer_type==&quot;Ale&quot;],conf.level = .95)</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  ipa_ale_df$IBU[ipa_ale_df$beer_type == &quot;IPA&quot;] and ipa_ale_df$IBU[ipa_ale_df$beer_type == &quot;Ale&quot;]
+## t = 30.118, df = 797.55, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  35.16402 40.06727
+## sample estimates:
+## mean of x mean of y 
+##  71.94898  34.33333</code></pre>
+<pre class="r"><code># Split data into train and test data
+# Train/Test with 70/30
+splitPerc = .7
+set.seed(4)
+
+trainIndices = sample(1:dim(ipa_ale_df)[1],round(splitPerc * dim(ipa_ale_df)[1]))
+train = ipa_ale_df[trainIndices,]
+test = ipa_ale_df[-trainIndices,]
+
+dim(train)</code></pre>
+<pre><code>## [1] 661  11</code></pre>
+<pre class="r"><code>head(train)</code></pre>
+<pre><code>##     Brew_ID           Beer_name Beer_ID   ABV IBU
+## 504     220  Bozone HopZone IPA    1289 0.070  80
+## 587     273        Heady Topper    1111 0.080 120
+## 819     420  Sanitas Saison Ale    1392 0.058  20
+## 771     376       Big Swell IPA      31 0.062  65
+## 71       28             Ironman    2218 0.090  50
+## 684     336 Iron Horse Pale Ale    1722 0.050  32
+##                              Style Ounces              Brewery_name
+## 504                   American IPA     12   Bozeman Brewing Company
+## 587 American Double / Imperial IPA     16             The Alchemist
+## 819         Saison / Farmhouse Ale     12   Sanitas Brewing Company
+## 771                   American IPA     12      Maui Brewing Company
+## 71              English Strong Ale     16 450 North Brewing Company
+## 684        American Pale Ale (APA)     12     Fargo Brewing Company
+##          City State beer_type
+## 504   Bozeman    MT       IPA
+## 587 Waterbury    VT       IPA
+## 819   Boulder    CO       Ale
+## 771   Lahaina    HI       IPA
+## 71   Columbus    IN       Ale
+## 684     Fargo    ND       Ale</code></pre>
+<pre class="r"><code>dim(test)</code></pre>
+<pre><code>## [1] 283  11</code></pre>
+<pre class="r"><code>head(test)</code></pre>
+<pre><code>##    Brew_ID    Beer_name Beer_ID   ABV IBU                    Style Ounces
+## 1        1 Get Together    2692 0.045  50             American IPA     16
+## 5        2       A Beer    2683 0.042  42  American Pale Ale (APA)     16
+## 7        2     Sho&#39;nuff    2680 0.040  13         Belgian Pale Ale     16
+## 17       5         Park    2661 0.047  19  American Pale Wheat Ale     12
+## 18       5    Westfalia    2660 0.056  16 American Amber / Red Ale     12
+## 19       5     Villager    2658 0.063  42             American IPA     12
+##                 Brewery_name          City State beer_type
+## 1          NorthGate Brewing   Minneapolis    MN       IPA
+## 5  Against the Grain Brewery    Louisville    KY       Ale
+## 7  Against the Grain Brewery    Louisville    KY       Ale
+## 17   Fort Point Beer Company San Francisco    CA       Ale
+## 18   Fort Point Beer Company San Francisco    CA       Ale
+## 19   Fort Point Beer Company San Francisco    CA       IPA</code></pre>
+<pre class="r"><code># Run the KNN model on the train and test data with k = 5
+classifications = knn(train[,c(&quot;ABV&quot;,&quot;IBU&quot;)],test[,c(&quot;ABV&quot;,&quot;IBU&quot;)],train$beer_type, prob = TRUE, k = 5)
+
+# Create a confusion matrix of the results with k = 5
+table(classifications,test$beer_type)</code></pre>
+<pre><code>##                
+## classifications Ale IPA
+##             Ale 158  20
+##             IPA  22  83</code></pre>
+<pre class="r"><code>CM_KNN_IPA = confusionMatrix(table(classifications,test$beer_type))
+CM_KNN_IPA</code></pre>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##                
+## classifications Ale IPA
+##             Ale 158  20
+##             IPA  22  83
+##                                           
+##                Accuracy : 0.8516          
+##                  95% CI : (0.8047, 0.8909)
+##     No Information Rate : 0.636           
+##     P-Value [Acc &gt; NIR] : 6.242e-16       
+##                                           
+##                   Kappa : 0.6808          
+##                                           
+##  Mcnemar&#39;s Test P-Value : 0.8774          
+##                                           
+##             Sensitivity : 0.8778          
+##             Specificity : 0.8058          
+##          Pos Pred Value : 0.8876          
+##          Neg Pred Value : 0.7905          
+##              Prevalence : 0.6360          
+##          Detection Rate : 0.5583          
+##    Detection Prevalence : 0.6290          
+##       Balanced Accuracy : 0.8418          
+##                                           
+##        &#39;Positive&#39; Class : Ale             
+## </code></pre>
+<pre class="r"><code># Predict what Budweiser would be classified as
+bud_test = data.frame(ABV = .05, IBU = 12)
+
+classify_bud = knn(train[,c(&quot;ABV&quot;,&quot;IBU&quot;)], bud_test, train$beer_type, prob = TRUE, k = 5)
+classify_bud</code></pre>
+<pre><code>## [1] Ale
+## attr(,&quot;prob&quot;)
+## [1] 1
+## Levels: Ale IPA</code></pre>
+<pre class="r"><code>attr(classify_bud,&quot;prob&quot;)</code></pre>
+<pre><code>## [1] 1</code></pre>
+<pre class="r"><code>#IPA vs Ale
+# Loop for many k and the average of many training / test partition
+# to pick the best k for the model 
+
+iterations = 200
+numks = 30
+
+masterAcc = matrix(nrow = iterations, ncol = numks)
+  
+for(j in 1:iterations)
+{
+accs = data.frame(accuracy = numeric(30), k = numeric(30))
+trainIndices = sample(1:dim(ipa_ale_df)[1],round(splitPerc * dim(ipa_ale_df)[1]))
+train = ipa_ale_df[trainIndices,]
+test = ipa_ale_df[-trainIndices,]
+for(i in 1:numks)
+{
+   classifications = knn(train[,c(&quot;ABV&quot;,&quot;IBU&quot;)],test[,c(&quot;ABV&quot;,&quot;IBU&quot;)],train$beer_type, prob = TRUE, k = i)
+  table(test$beer_type,classifications)
+  CM = confusionMatrix(table(test$beer_type,classifications))
+  masterAcc[j,i] = CM$overall[1]
+}
+
+}
+
+MeanAcc = colMeans(masterAcc)
+
+plot(seq(1,numks,1),MeanAcc, type = &quot;l&quot;)</code></pre>
+<p><img src="case_study1_beer_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<pre class="r"><code># Plot scatter plot for ABV and IBU of “Ales” and “IPAs”
+ggplot(data = ipa_ale_df) +
+  geom_point(mapping = aes(x = ABV, y = IBU, color=beer_type), position =&quot;jitter&quot;) +
+  ggtitle(&quot;IPA and Ales&quot;) + xlab(&quot;Alcohol by Volume (ABV)&quot;) + ylab(&quot;International Bitterness Units (IBU)&quot;) </code></pre>
+<p><img src="case_study1_beer_files/figure-html/unnamed-chunk-16-1.png" width="864" /></p>
+<pre class="r"><code>ipa_ale_df %&gt;%
+select(ABV, IBU, beer_type) %&gt;%
+ggpairs(mapping = aes(color = beer_type)) </code></pre>
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="case_study1_beer_files/figure-html/unnamed-chunk-17-1.png" width="960" /></p>
+<pre class="r"><code># Boundary plot from Michael Hahsler:  https://michael.hahsler.net/SMU/EMIS7332/R/viz_classifier.html
+decision_plot &lt;- function(model, data, class = NULL, predict_type = &quot;class&quot;,
+  resolution = 100, showgrid = TRUE, ...) {
+
+  if(!is.null(class)) cl &lt;- data[,class] else cl &lt;- 1
+  data &lt;- data[,1:2]
+  k &lt;- length(unique(cl))
+
+  plot(data, col = as.integer(cl)+1L, pch = as.integer(cl)+1L, ...)
+
+  # make grid
+  r &lt;- sapply(data, range, na.rm = TRUE)
+  xs &lt;- seq(r[1,1], r[2,1], length.out = resolution)
+  ys &lt;- seq(r[1,2], r[2,2], length.out = resolution)
+  g &lt;- cbind(rep(xs, each=resolution), rep(ys, time = resolution))
+  colnames(g) &lt;- colnames(r)
+  g &lt;- as.data.frame(g)
+
+  ### guess how to get class labels from predict
+  ### (unfortunately not very consistent between models)
+  p &lt;- predict(model, g, type = predict_type)
+  if(is.list(p)) p &lt;- p$class
+  p &lt;- as.factor(p)
+
+  if(showgrid) points(g, col = as.integer(p)+1L, pch = &quot;.&quot;)
+
+  z &lt;- matrix(as.integer(p), nrow = resolution, byrow = TRUE)
+  contour(xs, ys, z, add = TRUE, drawlabels = FALSE,
+    lwd = 2, levels = (1:(k-1))+.5)
+
+  invisible(z)
+}
+
+x_test &lt;- ipa_ale_df[,c(4:5,11)]
+x_test$beer_type &lt;- as.factor(x_test$beer_type)
+model &lt;- knn3(beer_type ~ ., data=x_test, k = 5)</code></pre>
+<pre class="r"><code># Boundary plot
+decision_plot(model, x_test, class = &quot;beer_type&quot;, main = &quot;kNN (5)&quot;)</code></pre>
+<p><img src="case_study1_beer_files/figure-html/unnamed-chunk-19-1.png" width="1152" /></p>
+</div>
+<div id="a.-what-states-are-closest-to-the-bud-abvibu-profile" class="section level2">
+<h2>9a. What states are closest to the Bud ABV/IBU profile?</h2>
+<pre class="r"><code># Run the KNN model on the train and test data and add the state parameter (Use all data to train/test)
+classify_w_state = knn(train[, 4:5],test[, 4:5],train$State, prob = TRUE, k = 5)
+classify_bud_st = knn(clean_df[, 4:5], bud_test, clean_df$State, prob = TRUE, k = 3)
+CM_KNN_State = confusionMatrix(table(classify_w_state,test$State))
+CM_KNN_State</code></pre>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##                 
+## classify_w_state AK AL AR AZ CA CO CT DC DE FL GA HI IA ID IL IN KS KY LA
+##               AK  0  0  0  0  1  1  0  0  0  0  0  0  0  0  0  0  0  0  0
+##               AL  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1  1  0  0  0
+##               AR  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+##               AZ  0  0  0  1  1  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+##               CA  0  0  0  0  7  3  0  0  0  1  0  0  0  1  0  3  1  0  0
+##               CO  2  0  0  0  0  8  0  0  0  1  0  0  0  1  0  0  0  0  0
+##               CT  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+##               DC  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+##               DE  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+##               FL  0  0  0  0  4  1  0  0  0  2  0  0  0  0  0  0  0  0  0
+##               GA  0  0  0  0  2  0  0  0  0  0  1  0  0  0  0  0  0  0  0
+##               HI  0  0  0  0  1  0  0  0  0  1  0  0  0  0  0  0  0  0  0
+##               IA  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+##               ID  0  0  0  0  0  3  0  0  0  0  0  0  0  0  0  0  1  0  0
+##               IL  0  0  0  0  1  2  0  0  0  0  0  0  1  0  1  1  0  0  0
+##               IN  0  0  0  0  0  0  0  0  0  0  0  2  1  0  1  5  1  0  1
+##               KS  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+##               KY  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+##               LA  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1  0  0  0  0
+##                 
+## classify_w_state MA MD ME MI MN MO MS MT NC ND NE NH NJ NM NV NY OH OK OR
+##               AK  0  0  1  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+##               AL  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1  0  0
+##               AR  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+##               AZ  1  1  0  0  1  0  0  0  0  0  0  0  0  0  0  0  1  0  0
+##               CA  0  0  0  1  1  0  1  0  1  0  0  0  1  1  0  1  4  1  2
+##               CO  0  0  0  2  0  0  1  2  2  0  1  0  0  0  0  2  1  0  0
+##               CT  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+##               DC  0  0  0  0  1  0  0  0  0  0  0  0  0  0  0  0  0  1  0
+##               DE  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+##               FL  0  1  0  0  0  0  0  1  0  0  0  0  1  0  0  0  1  0  2
+##               GA  1  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1  0  0
+##               HI  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1  0  0
+##               IA  0  0  0  0  1  1  0  0  0  0  0  0  0  0  0  0  0  0  0
+##               ID  0  0  0  0  0  0  0  0  0  0  0  0  0  1  0  0  1  1  0
+##               IL  0  0  0  0  1  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+##               IN  0  0  0  1  0  0  0  0  1  0  0  0  0  0  0  0  0  0  0
+##               KS  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+##               KY  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+##               LA  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+##                 
+## classify_w_state PA RI SC SD TN TX UT VA VT WA WI WV WY
+##               AK  0  0  0  0  0  1  0  0  0  0  1  0  0
+##               AL  0  0  0  0  0  0  0  0  0  1  0  0  0
+##               AR  0  0  0  0  0  0  0  0  0  0  0  0  0
+##               AZ  0  0  0  0  0  0  0  0  0  0  0  0  0
+##               CA  0  0  0  0  0  0  0  0  0  0  0  0  0
+##               CO  0  0  0  0  0  0  0  0  0  1  1  0  0
+##               CT  0  0  0  0  0  0  0  0  0  0  0  0  0
+##               DC  0  0  0  0  0  0  0  0  1  0  0  0  0
+##               DE  0  0  0  0  0  0  0  1  0  0  0  0  0
+##               FL  0  0  0  0  0  0  1  0  0  0  0  0  0
+##               GA  0  0  0  0  0  0  0  0  0  0  0  0  1
+##               HI  0  0  0  0  0  0  1  0  0  0  0  0  0
+##               IA  0  0  0  0  0  0  1  0  0  1  0  0  0
+##               ID  0  0  0  0  0  1  0  0  0  1  0  0  0
+##               IL  0  0  0  0  0  0  0  0  0  1  0  0  1
+##               IN  0  1  0  0  0  1  0  0  0  1  0  0  0
+##               KS  0  0  0  0  0  1  0  0  0  0  1  0  0
+##               KY  0  0  0  0  0  0  0  0  0  0  0  0  0
+##               LA  0  0  0  0  0  0  0  2  0  0  0  0  0
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 32 rows ]
+## 
+## Overall Statistics
+##                                           
+##                Accuracy : 0.1484          
+##                  95% CI : (0.1091, 0.1953)
+##     No Information Rate : 0.1131          
+##     P-Value [Acc &gt; NIR] : 0.04113         
+##                                           
+##                   Kappa : 0.1077          
+##                                           
+##  Mcnemar&#39;s Test P-Value : NA              
+## 
+## Statistics by Class:
+## 
+##                      Class: AK Class: AL Class: AR Class: AZ Class: CA
+## Sensitivity            0.00000  0.000000        NA  0.250000   0.21875
+## Specificity            0.98214  0.985816         1  0.982079   0.90837
+## Pos Pred Value         0.00000  0.000000        NA  0.166667   0.23333
+## Neg Pred Value         0.98921  0.996416        NA  0.989170   0.90119
+## Prevalence             0.01060  0.003534         0  0.014134   0.11307
+## Detection Rate         0.00000  0.000000         0  0.003534   0.02473
+## Detection Prevalence   0.01767  0.014134         0  0.021201   0.10601
+## Balanced Accuracy      0.49107  0.492908        NA  0.616039   0.56356
+##                      Class: CO Class: CT Class: DC Class: DE Class: FL
+## Sensitivity            0.25000        NA  0.000000        NA  0.222222
+## Specificity            0.93227         1  0.989362  0.996466  0.956204
+## Pos Pred Value         0.32000        NA  0.000000        NA  0.142857
+## Neg Pred Value         0.90698        NA  0.996429        NA  0.973978
+## Prevalence             0.11307         0  0.003534  0.000000  0.031802
+## Detection Rate         0.02827         0  0.000000  0.000000  0.007067
+## Detection Prevalence   0.08834         0  0.010601  0.003534  0.049470
+## Balanced Accuracy      0.59114        NA  0.494681        NA  0.589213
+##                      Class: GA Class: HI Class: IA Class: ID Class: IL
+## Sensitivity           0.500000  0.000000   0.00000   0.00000  0.125000
+## Specificity           0.982206  0.985765   0.98571   0.96763  0.970909
+## Pos Pred Value        0.166667  0.000000   0.00000   0.00000  0.111111
+## Neg Pred Value        0.996390  0.992832   0.98925   0.98175  0.974453
+## Prevalence            0.007067  0.007067   0.01060   0.01767  0.028269
+## Detection Rate        0.003534  0.000000   0.00000   0.00000  0.003534
+## Detection Prevalence  0.021201  0.014134   0.01413   0.03180  0.031802
+## Balanced Accuracy     0.741103  0.492883   0.49286   0.48381  0.547955
+##                      Class: IN Class: KS Class: KY Class: LA Class: MA
+## Sensitivity            0.26316  0.000000  0.000000  0.000000  0.125000
+## Specificity            0.95833  0.992857  1.000000  0.989362  0.967273
+## Pos Pred Value         0.31250  0.000000       NaN  0.000000  0.100000
+## Neg Pred Value         0.94757  0.989324  0.992933  0.996429  0.974359
+## Prevalence             0.06714  0.010601  0.007067  0.003534  0.028269
+## Detection Rate         0.01767  0.000000  0.000000  0.000000  0.003534
+## Detection Prevalence   0.05654  0.007067  0.000000  0.010601  0.035336
+## Balanced Accuracy      0.61075  0.496429  0.500000  0.494681  0.546136
+##                      Class: MD Class: ME Class: MI Class: MN Class: MO
+## Sensitivity            0.00000  0.000000   0.00000   0.00000  0.000000
+## Specificity            1.00000  1.000000   0.96364   0.98535  0.992832
+## Pos Pred Value             NaN       NaN   0.00000   0.00000  0.000000
+## Neg Pred Value         0.98587  0.996466   0.97070   0.96416  0.985765
+## Prevalence             0.01413  0.003534   0.02827   0.03534  0.014134
+## Detection Rate         0.00000  0.000000   0.00000   0.00000  0.000000
+## Detection Prevalence   0.00000  0.000000   0.03534   0.01413  0.007067
+## Balanced Accuracy      0.50000  0.500000   0.48182   0.49267  0.496416
+##                      Class: MS Class: MT Class: NC Class: ND Class: NE
+## Sensitivity           0.000000  0.200000   0.00000        NA  0.000000
+## Specificity           0.996429  0.971223   0.97842         1  1.000000
+## Pos Pred Value        0.000000  0.111111   0.00000        NA       NaN
+## Neg Pred Value        0.989362  0.985401   0.98195        NA  0.992933
+## Prevalence            0.010601  0.017668   0.01767         0  0.007067
+## Detection Rate        0.000000  0.003534   0.00000         0  0.000000
+## Detection Prevalence  0.003534  0.031802   0.02120         0  0.000000
+## Balanced Accuracy     0.498214  0.585612   0.48921        NA  0.500000
+##                      Class: NH Class: NJ Class: NM Class: NV Class: NY
+## Sensitivity                 NA  0.000000    0.0000  0.000000  0.125000
+## Specificity                  1  0.992883    1.0000  0.996454  0.974545
+## Pos Pred Value              NA  0.000000       NaN  0.000000  0.125000
+## Neg Pred Value              NA  0.992883    0.9894  0.996454  0.974545
+## Prevalence                   0  0.007067    0.0106  0.003534  0.028269
+## Detection Rate               0  0.000000    0.0000  0.000000  0.003534
+## Detection Prevalence         0  0.007067    0.0000  0.003534  0.028269
+## Balanced Accuracy           NA  0.496441    0.5000  0.498227  0.549773
+##                      Class: OH Class: OK Class: OR Class: PA Class: RI
+## Sensitivity           0.000000  0.200000   0.30435  0.500000  0.333333
+## Specificity           0.996269  0.989209   0.95769  0.982206  0.975000
+## Pos Pred Value        0.000000  0.250000   0.38889  0.166667  0.125000
+## Neg Pred Value        0.946809  0.985663   0.93962  0.996390  0.992727
+## Prevalence            0.053004  0.017668   0.08127  0.007067  0.010601
+## Detection Rate        0.000000  0.003534   0.02473  0.003534  0.003534
+## Detection Prevalence  0.003534  0.014134   0.06360  0.021201  0.028269
+## Balanced Accuracy     0.498134  0.594604   0.63102  0.741103  0.654167
+##                      Class: SC Class: SD Class: TN Class: TX Class: UT
+## Sensitivity                 NA        NA        NA  0.222222    0.0000
+## Specificity           0.996466         1    0.9894  0.890511    1.0000
+## Pos Pred Value              NA        NA        NA  0.062500       NaN
+## Neg Pred Value              NA        NA        NA  0.972112    0.9894
+## Prevalence            0.000000         0    0.0000  0.031802    0.0106
+## Detection Rate        0.000000         0    0.0000  0.007067    0.0000
+## Detection Prevalence  0.003534         0    0.0106  0.113074    0.0000
+## Balanced Accuracy           NA        NA        NA  0.556367    0.5000
+##                      Class: VA Class: VT Class: WA Class: WI Class: WV
+## Sensitivity            0.00000  0.000000  0.083333  0.125000        NA
+## Specificity            0.98188  1.000000  0.988930  0.985455         1
+## Pos Pred Value         0.00000       NaN  0.250000  0.200000        NA
+## Neg Pred Value         0.97482  0.992933  0.960573  0.974820        NA
+## Prevalence             0.02473  0.007067  0.042403  0.028269         0
+## Detection Rate         0.00000  0.000000  0.003534  0.003534         0
+## Detection Prevalence   0.01767  0.000000  0.014134  0.017668         0
+## Balanced Accuracy      0.49094  0.500000  0.536132  0.555227        NA
+##                      Class: WY
+## Sensitivity           0.000000
+## Specificity           0.992857
+## Pos Pred Value        0.000000
+## Neg Pred Value        0.989324
+## Prevalence            0.010601
+## Detection Rate        0.000000
+## Detection Prevalence  0.007067
+## Balanced Accuracy     0.496429</code></pre>
+<pre class="r"><code>#Run KNN model for 100 different k to find k with highest probabilities
+bud_test = data.frame(ABV = .05, IBU = 12)
+accs = data.frame(probability = numeric(100), k = numeric(100))
+
+for(i in 1:100)
+{
+  classifications = knn(clean_df[, 4:5], bud_test, clean_df$State, prob = TRUE, k = i)
+
+  accs$probability[i] = attr(classifications,&quot;prob&quot;)[1]
+  accs$k[i] = i
+}
+
+plot(accs$k,accs$probability, type = &quot;l&quot;, xlab = &quot;k&quot;)</code></pre>
+<p><img src="case_study1_beer_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
+<pre class="r"><code>accs %&gt;% arrange(desc(probability))%&gt;% slice(1:10)</code></pre>
+<pre><code>##    probability  k
+## 1    0.2222222  9
+## 2    0.2142857 14
+## 3    0.2000000  1
+## 4    0.2000000  2
+## 5    0.2000000  3
+## 6    0.2000000  4
+## 7    0.2000000  5
+## 8    0.2000000 10
+## 9    0.2000000 15
+## 10   0.1875000 16</code></pre>
+<pre class="r"><code>#Find the states for k= 9,14
+
+knn(clean_df[, 4:5], bud_test, clean_df$State, prob = TRUE, k = 9)</code></pre>
+<pre><code>## [1] ID
+## attr(,&quot;prob&quot;)
+## [1] 0.2222222
+## 51 Levels: AK AL AR AZ CA CO CT DC DE FL GA HI IA ID IL IN KS KY LA ... WY</code></pre>
+<pre class="r"><code>knn(clean_df[, 4:5], bud_test, clean_df$State, prob = TRUE, k = 14)</code></pre>
+<pre><code>## [1] MI
+## attr(,&quot;prob&quot;)
+## [1] 0.2142857
+## 51 Levels: AK AL AR AZ CA CO CT DC DE FL GA HI IA ID IL IN KS KY LA ... WY</code></pre>
+<pre class="r"><code>#Plot 
+clean_df%&gt;% filter(State==&quot;ID&quot; | State==&quot;MI&quot;) %&gt;% select(ABV,IBU,State)%&gt;% ggplot(aes(x= ABV, y=IBU, color =State))+ geom_point() +ggtitle(&quot;Indiana and Miami ABV/IBU&quot;)</code></pre>
+<p><img src="case_study1_beer_files/figure-html/unnamed-chunk-20-2.png" width="672" /></p>
+<pre class="r"><code>med_abv_ibu%&gt;% filter(State==&quot;ID&quot; | State==&quot;MI&quot;)</code></pre>
+<pre><code>## # A tibble: 2 x 4
+##   State med_abv med_ibu count
+##   &lt;fct&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;int&gt;
+## 1 ID      0.058      39    17
+## 2 MI      0.056      35    38</code></pre>
+</div>
+<div id="b.-add-census-data" class="section level2">
+<h2>9b. Add census data</h2>
+<pre class="r"><code># Find out what states have a low # of breweries compared to the state population using census data
+census_api_key(&quot;84522ebd9660066bc20c58e482678db60bc04365&quot;)</code></pre>
+<pre><code>## To install your API key for use in future sessions, run this function with `install = TRUE`.</code></pre>
+<pre class="r"><code># Estimated median income
+us_inc &lt;- get_acs(geography = &quot;state&quot;, variables = &quot;B19013_001&quot;)</code></pre>
+<pre><code>## Getting data from the 2014-2018 5-year ACS</code></pre>
+<pre class="r"><code>us_inc &lt;-  subset(us_inc, select = c(NAME, estimate))
+setnames(us_inc, old=c(&quot;NAME&quot;,&quot;estimate&quot;), new=c(&quot;id&quot;, &quot;med_income_est&quot;))
+
+# Estimated population
+us_pop &lt;- get_acs(geography = &quot;state&quot;, variables = &quot;B01003_001&quot;)</code></pre>
+<pre><code>## Getting data from the 2014-2018 5-year ACS</code></pre>
+<pre class="r"><code>us_pop &lt;- subset(us_pop, select = c(NAME, estimate))
+setnames(us_pop, old=c(&quot;NAME&quot;,&quot;estimate&quot;), new=c(&quot;id&quot;, &quot;pop_est&quot;))
+
+# Merge population &amp; median income
+(census_df &lt;- merge(us_inc, us_pop, by=&quot;id&quot;))</code></pre>
+<pre><code>##                      id med_income_est  pop_est
+## 1               Alabama          48486  4864680
+## 2                Alaska          76715   738516
+## 3               Arizona          56213  6946685
+## 4              Arkansas          45726  2990671
+## 5            California          71228 39148760
+## 6              Colorado          68811  5531141
+## 7           Connecticut          76106  3581504
+## 8              Delaware          65627   949495
+## 9  District of Columbia          82604   684498
+## 10              Florida          53267 20598139
+## 11              Georgia          55679 10297484
+## 12               Hawaii          78084  1422029
+## 13                Idaho          53089  1687809
+## 14             Illinois          63575 12821497
+## 15              Indiana          54325  6637426
+## 16                 Iowa          58580  3132499
+## 17               Kansas          57422  2908776
+## 18             Kentucky          48392  4440204
+## 19            Louisiana          47942  4663616
+## 20                Maine          55425  1332813
+## 21             Maryland          81868  6003435
+## 22        Massachusetts          77378  6830193
+## 23             Michigan          54938  9957488
+## 24            Minnesota          68411  5527358
+## 25          Mississippi          43567  2988762
+## 26             Missouri          53560  6090062
+## 27              Montana          52559  1041732
+## 28             Nebraska          59116  1904760
+## 29               Nevada          57598  2922849
+## 30        New Hampshire          74057  1343622
+## 31           New Jersey          79363  8881845
+## 32           New Mexico          48059  2092434
+## 33             New York          65323 19618453
+## 34       North Carolina          52413 10155624
+## 35         North Dakota          63473   752201
+## 36                 Ohio          54533 11641879
+## 37             Oklahoma          51424  3918137
+## 38               Oregon          59393  4081943
+## 39         Pennsylvania          59445 12791181
+## 40          Puerto Rico          20166  3386941
+## 41         Rhode Island          63296  1056611
+## 42       South Carolina          51015  4955925
+## 43         South Dakota          56499   864289
+## 44            Tennessee          50972  6651089
+## 45                Texas          59570 27885195
+## 46                 Utah          68374  3045350
+## 47              Vermont          60076   624977
+## 48             Virginia          71564  8413774
+## 49           Washington          70116  7294336
+## 50        West Virginia          44921  1829054
+## 51            Wisconsin          59209  5778394
+## 52              Wyoming          62268   581836</code></pre>
+<pre class="r"><code># Change the states to lower case so that you can merge it with the brew_by_state dataframe
+census_df$id &lt;- tolower(census_df$id)
+
+# Merge census data with the brew_by_state df
+brew_by_state_census &lt;- merge(brew_by_state, census_df, by=&quot;id&quot;)
+
+# Create a column for brewery ratio
+brew_by_state_census$brewery_ratio &lt;- round(brew_by_state_census$pop_est/brew_by_state_census$count)
+
+# Create one dataframe that has brew_by_state, census, and median ABV and IBU
+master_df &lt;- merge(brew_by_state_census, med_abv_ibu, by=&quot;State&quot;)
+
+# Sort
+master_df &lt;- master_df[order(-master_df$brewery_ratio),]
+master_df_final &lt;- subset(master_df, select = c(State, id, count.x, med_income_est, pop_est, brewery_ratio, med_abv, med_ibu))
+top_3 &lt;- top_n(master_df_final, 3, brewery_ratio)
+
+View(top_3)</code></pre>
+</div>
+<div id="other-median-ibu-of-the-dataset" class="section level2">
+<h2>Other: Median IBU of the dataset</h2>
+<pre class="r"><code>#Summary of key statistics of IBU for the conclusions
+summary(clean_df$IBU)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    4.00   21.00   35.00   42.74   64.00  138.00</code></pre>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
