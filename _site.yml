@@ -8,4 +8,5 @@ navbar:
       href: CLT_2.html
     - text: "about me"
       href: Aboutme.html
-   
+    - text: "Casestudy"
+      href: casestudy1.html
